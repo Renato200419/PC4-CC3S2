@@ -1,0 +1,28 @@
+{
+    "name": "Renato",
+    "dockerFile": "Dockerfile",  // Usaremos el Dockerfile para personalización
+    "context": "..",  // Indica dónde buscar el contexto de construcción
+    "remoteUser": "Renato",  // Usuario que se utilizará dentro del contenedor
+    "workspaceFolder": "/project",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/project,type=bind,consistency=delegated",
+    "runArgs": ["-h", "renato"],  // Argumentos adicionales para correr el contenedor
+    "customizations": {
+        "vscode": {
+            "extensions": [
+				"VisualStudioExptTeam.vscodeintellicode", // Extensión de IntelliCode
+                "ms-python.python",  // Extensión de Python para VSCode
+                "ms-python.vscode-pylance",  // Extensión para Pylance
+				"CucumberOpen.cucumber-official", // Extensión para Cucumber
+				"ms-azuretools.vscode-docker",  // Extensión para Docker
+				"donjayamanne.githistory", // Extensión para ver el historial de Git
+				"hbenl.vscode-test-explorer", // Extensión para explorar pruebas
+                "GitHub.vscode-pull-request-github",  // Extensión para GitHub PRs
+                "streetsidesoftware.code-spell-checker"  // Corrector ortográfico
+            ]
+        }
+    },
+    "postCreateCommand": "pip install -r requirements.txt",  // Instalación de dependencias automáticamente
+    "features": {
+        "docker-in-docker": "latest"  // Soporte para usar Docker dentro del contenedor si lo necesitas
+    }
+}
