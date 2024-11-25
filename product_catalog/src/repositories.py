@@ -1,32 +1,51 @@
+from peewee import Model, CharField, IntegerField, SqliteDatabase
+
+db = SqliteDatabase('products.db')
+
+class Product(Model):
+    name = CharField()
+    description = CharField()
+    user_id = IntegerField()
+
+    class Meta:
+        database = db
+
+db.connect()
+db.create_tables([Product])
+
 class ProductRepository:
-    """Repositorio para manejar la persistencia de productos"""
-
-    def __init__(self):
-        self.products = {}  # Diccionario simulado como base de datos
-        self.counter = 1
-
-    def get_all(self):
-        """Retornar todos los productos"""
-        return list(self.products.values())
-
     def create(self, data):
-        """Crear un nuevo producto"""
-        product_id = self.counter
-        self.products[product_id] = {"id": product_id, **data}
-        self.counter += 1
-        return self.products[product_id]
+        product = Product.create(
+            name=data['name'],
+            description=data['description'],
+            user_id=data['user_id']
+        )
+        return {
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'user_id': product.user_id
+        }
+
+    def get_by_id(self, product_id):
+        try:
+            product = Product.get(Product.id == product_id)
+            return {
+                'id': product.id,
+                'name': product.name,
+                'description': product.description,
+                'user_id': product.user_id
+            }
+        except Product.DoesNotExist:
+            return None
 
     def update(self, product_id, data):
-        """Actualizar un producto existente"""
-        if product_id in self.products:
-            self.products[product_id].update(data)
-            return self.products[product_id]
+        query = Product.update(**data).where(Product.id == product_id)
+        if query.execute():
+            return self.get_by_id(product_id)
         else:
-            raise ValueError("Producto no encontrado")
+            return None
 
     def delete(self, product_id):
-        """Eliminar un producto"""
-        if product_id in self.products:
-            del self.products[product_id]
-        else:
-            raise ValueError("Producto no encontrado")
+        query = Product.delete().where(Product.id == product_id)
+        return query.execute() > 0

@@ -3,3 +3,4 @@ requests       # Para comunicación HTTP entre servicios
 pytest         # Para pruebas unitarias
 pytest-cov     # Métricas de cobertura
 radon          # Para medir complejidad ciclomática 
+peewee          # ORM para SQLite

@@ -1,32 +1,40 @@
-from flask import Blueprint, jsonify, request
-from services import ProductService
+from flask import Blueprint, request, jsonify
+from product_catalog.src.services import ProductService
 
 # Crear un Blueprint para el controlador
-product_controller = Blueprint('product_controller', __name__)
+product_blueprint = Blueprint('product_controller', __name__)
 product_service = ProductService()
 
-@product_controller.route('/products', methods=['GET'])
-def get_products():
-    """Obtener todos los productos"""
-    products = product_service.get_all_products()
-    return jsonify(products), 200
-
-@product_controller.route('/products', methods=['POST'])
+@product_blueprint.route('/', methods=['POST'])
 def create_product():
-    """Crear un nuevo producto"""
     data = request.get_json()
     product = product_service.create_product(data)
-    return jsonify(product), 201
+    if 'error' in product:
+        return jsonify(product), 400
+    else:
+        return jsonify(product), 201
 
-@product_controller.route('/products/<int:product_id>', methods=['PUT'])
+@product_blueprint.route('/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    product = product_service.get_product(product_id)
+    if product:
+        return jsonify(product)
+    else:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+
+@product_blueprint.route('/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
-    """Actualizar un producto existente"""
     data = request.get_json()
     updated_product = product_service.update_product(product_id, data)
-    return jsonify(updated_product), 200
+    if updated_product:
+        return jsonify(updated_product)
+    else:
+        return jsonify({'error': 'Producto no encontrado'}), 404
 
-@product_controller.route('/products/<int:product_id>', methods=['DELETE'])
+@product_blueprint.route('/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
-    """Eliminar un producto por ID"""
-    product_service.delete_product(product_id)
-    return '', 204
+    result = product_service.delete_product(product_id)
+    if result:
+        return jsonify({'message': 'Producto eliminado'})
+    else:
+        return jsonify({'error': 'Producto no encontrado'}), 404

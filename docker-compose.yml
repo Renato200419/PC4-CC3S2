@@ -1,19 +1,24 @@
 version: '3.8'
 services:
   user_management:
-    build:
-      context: ./user_management
+    build: ./user_management
     ports:
       - "5000:5000"
+    volumes:
+      - ./user_management:/app
     networks:
-      - service_network
+      - my_network
+
   product_catalog:
-    build:
-      context: ./product_catalog
+    build: ./product_catalog
     ports:
       - "5001:5001"
+    volumes:
+      - ./product_catalog:/app
+    depends_on:
+      - user_management
     networks:
-      - service_network
+      - my_network
+
 networks:
-  service_network:
-    driver: bridge
+  my_network:
